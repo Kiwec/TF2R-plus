@@ -2,7 +2,7 @@
 // @name           TF2R plus
 // @author         Kiwec
 // @description    A script for tf2r.com
-// @version        2.5.1
+// @version        2.5.2
 // @include        http://tf2r.com/*
 // @grant          none
 // ==/UserScript==
@@ -17,6 +17,7 @@ if(document.URL != 'http://tf2r.com/news.html')
 	{
 		delShit(document.getElementsByClassName('mSuc nbg'));
 		delShit(document.getElementsByClassName('mNeut nbg'));
+		delShit(document.getElementsByClassName('mError nbg'));
 	}
 	
 	// If ads are NOT enabled
@@ -86,6 +87,7 @@ if(document.URL == 'http://tf2r.com/settings.html')
 	mainDiv.innerHTML = '';
 	
 	createSetting('Raffle information', 'When enabled, the number of items and type of raffle (A21/1:1) shows up in raffles.', 'k_tf2r_raffleinfo');
+	createSetting('Delivery help', 'Adds some features to help item delivery.', 'k_tf2r_deliveryHelp');
 	createSetting('Chat images', 'When enabled, puush and imgur links will be replaced by images.', 'k_tf2r_chatImages');
 	createSetting('Link coloration', 'When enabled, most unvisited links will be colored. This is useful to see unvisited raffles or hidden links in raffle descriptions.', 'k_tf2r_linkColoration');
 	createSetting('Link banner hiding', 'When enabled, blue banners will be hidden everywhere but on the news page.', 'k_tf2r_bannerHiding');
@@ -272,8 +274,70 @@ if(document.getElementById('winc') != null)
 		}
 	}
 	
+	// Delivery help features
+	if(getBoolFromLocalStorage('k_tf2r_deliveryHelp'))
+	{
+		var winnerList = document.getElementsByClassName('participants_winner');
+		if(winnerList.length > 0) {
+			var raffleArea = document.getElementsByClassName('indent');
+			if(raffleArea.length != 1) return console.log('[TF2R+] Invalid raffle area.');
+			var deliverAllButton = document.createElement('div');
+			deliverAllButton.style = 'height:35px;';
+			deliverAllButton.innerHTML = '<div class="ncbutton"><input id="deliverAll" value="Mark all as delivered" type="button"></div>';
+			
+			raffleArea[0].insertBefore(deliverAllButton, winnerList[0]);
+			
+			// Getting ajax script
+			var rid = '';
+			var scripts = document.getElementsByTagName('script');
+			for(var i in scripts) {
+				if(scripts[i].textContent == undefined) continue;
+				if(scripts[i].textContent.indexOf('$(".spectik").click(function(){') != -1) {
+					var match = scripts[i].textContent.match(/"rid": "(.*?)",/);
+					if(match.length == 2) {
+						rid = match[1];
+						break;
+					}
+				}
+			}
+			if(rid == '') return console.log('[TF2R+] No spectik event found.');
+			
+			var markAllDelivered = function() {
+				var tf2r_winners = document.querySelectorAll('.twinrow #ap');
+				markDelivered(0);
+				function markDelivered(id) {
+					if(id != tf2r_winners.length) {
+						$.ajax({
+							type: 'post',
+							url: 'http://tf2r.com/job.php',
+							dataType: 'json',
+							data: {
+								'tik': 'true',
+								'rid': rid,
+								'win': tf2r_winners[id].getAttribute('wid'),
+								'option': 'ap'
+							},
+							success: function(data) {
+								if(data.status == 'fail') {
+									alert(data.message);
+								} else {
+									var markZone = tf2r_winners[id].parentElement;
+									markZone.width = '32px';
+									markZone.innerHTML = '<font style="font-size:38px;color:#00B359;">✓</font>';
+									markDelivered(++id);
+								}
+							}
+						});
+					}
+				}
+			}
+			
+			document.getElementById('deliverAll').addEventListener('click', markAllDelivered);
+		}
+	}
+	
 	// Rep refreshing
-	setInterval(refreshRep, 500);
+	setInterval(refreshRep, 1500);
 }
 
 function createSetting(text, description, settingsKey)
