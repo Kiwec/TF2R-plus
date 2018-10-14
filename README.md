@@ -6,12 +6,12 @@ This script enhances tf2r.com by adding a ton of new features and by fixing long
 
 ##### Firefox
 
-- Install [GreaseMonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)
+- Install [ViolentMonkey](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/)
 - Install [TF2R plus](https://github.com/Kiwec/TF2R-plus/raw/master/tf2rplus.user.js)
 
 ##### Google Chrome
 
-- Install [TamperMonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- Install [ViolentMonkey](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
 - Install [TF2R plus](https://github.com/Kiwec/TF2R-plus/raw/master/tf2rplus.user.js)
 
 ## Contributing
